@@ -20,6 +20,9 @@ WebServer server(serverPort);
 
 bool isPcOn = false;
 
+const unsigned long AUTO_CHECK_INTERVAL = 60000; // 1 minute
+unsigned long lastAutoCheckTime = 0;
+
 void checkPcStatus() {
   isPcOn = Ping.ping(pc_ip);
 }
@@ -179,10 +182,26 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/wake", handleWake);
   server.begin();
-  
+
   Serial.println("\nWeb server started!");
+
+  // Start the 1-minute auto-check timer after WiFi is connected
+  lastAutoCheckTime = millis();
 }
 
 void loop() {
   server.handleClient();
+
+  // Auto-check every 1 minute: if PC is offline, send WoL immediately
+  if (millis() - lastAutoCheckTime >= AUTO_CHECK_INTERVAL) {
+    lastAutoCheckTime = millis();
+    checkPcStatus();
+    if (!isPcOn) {
+      Serial.println("[AUTO-WAKE] PC is OFFLINE - Sending Wake-on-LAN packet...");
+      WOL.sendMagicPacket(MACAddress);
+      Serial.println("[AUTO-WAKE] Magic packet sent!");
+    } else {
+      Serial.println("[AUTO-CHECK] PC is ONLINE.");
+    }
+  }
 }
