@@ -187,6 +187,7 @@ void setup() {
 
   server.on("/", handleRoot);
   server.on("/wake", handleWake);
+  server.onNotFound([]() { server.send(404, "text/plain", "Not found"); });
   server.begin();
 
   Serial.println("\nWeb server started!");
