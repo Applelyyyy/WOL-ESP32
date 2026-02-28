@@ -11,8 +11,13 @@ const char* password = "YOUR_WIFI_PASSWORD";  // Change to your WiFi password
 
 const char* serverName = "WOL-Server";        // Change to your server name
 const char *MACAddress = "AA:BB:CC:DD:EE:FF"; // Change to your PC's MAC address
-IPAddress pc_ip(0, 0, 0, 0);                  // Change to your PC's IP address Ex. IPAddress pc_ip(10, 10, 1, 11); 
+IPAddress pc_ip(0, 0, 0, 0);                  // Change to your PC's IP address Ex. IPAddress pc_ip(10, 10, 1, 11);
 const int serverPort = 44;                    // ESP32 web server port
+
+// ESP32 Static IP config
+IPAddress esp_ip(0, 0, 0, 0);       // ESP32 static IP  Ex. IPAddress esp_ip(192, 168, 1, 100);
+IPAddress esp_gateway(0, 0, 0, 0);  // Router/gateway   Ex. IPAddress esp_gateway(192, 168, 1, 1);
+IPAddress esp_subnet(255, 255, 255, 0);
 
 WiFiUDP UDP;
 WakeOnLan WOL(UDP);
@@ -130,6 +135,7 @@ void setup() {
   Serial.println(ssid);
   
   WiFi.mode(WIFI_STA);
+  WiFi.config(esp_ip, esp_gateway, esp_subnet);
   WiFi.begin(ssid, password);
   
   int attempts = 0;
